@@ -1,0 +1,98 @@
+Class Category {
+	string name;
+	string desc;
+	datetime created;
+	datetime modified;
+	string[] workflows;
+}
+
+Class Workflow {
+	string name;
+	string desc;
+	int steps;
+	datetime created;
+	datetime modified;
+	string[] categories;
+}
+
+Class CategoryList {
+	string[] categories;
+}
+
+AddCategory(Category cat) {
+	Insert into category values(name=cat.name, desc=cat.desc, creation=Now());
+	For each cat.workflows[] {
+		AssAsignment($_, cat.name);
+	}
+}
+
+AddWorkflow(Workflow work) {
+	Insert into workflow values(name=work.name, desc=work.desc, steps=work.steps, creation=Now());
+	for each work.categories[] {
+		AddAsignment(work.name, $_);
+	}
+}
+
+DeleteCategory(Category cat) {
+	For each cat.workflows[] {
+		Select count(*) as num from assignment where workName=$_;
+		if num = 1 then return False;
+	}
+	DeleteAssignment(NULL,cat.name);
+	Delete from category where name=cat.name;
+	return True;
+}
+
+DeleteWorkflow(Workflow work) {
+	DeleteAssignment(work.name,NULL);
+	Delete from workflow where name=work.name;
+}
+
+UpdateCategory(Category cat) {
+	Update category set name=cat.name, desc=cat.desc, modified=Now() where name=cat.name;
+	DeleteAssignment(NULL, cat.name);
+	For each cat.workflows[] {
+		AddAssignment($_, cat.name);
+	}
+}
+
+UpdateWorkflow(Workflow work) {
+	Update workflow set name=work.name, desc=work.desc, steps=work.steps where name=work.name;
+	DeleteAssignments(work.name, NULL);
+	For each work.categories[] {
+		AddAsignment(work.name, $_);
+	}
+}
+
+Category GetCategory(string name) {
+	row = Select * from category where name=name;
+	rows[] = Select distinct workName from assignment where catName=name
+	New Category tempCat(row.name, row.desc, row.created, row.modified, rows[]);
+	return(tempCat);
+}
+
+Workflow GetWorkflow(string name) {
+	row = Select * from workflow where name=name;
+	rows[] = Select distinct catName from assignment where workName=name
+	New Workflow tempWork(row.name, row.desc, row.steps, row.created, row.modified, rows[]);
+	return(tempWork)
+}
+
+CategoryList GetCategoryList() {
+	rows = Select name from category;
+	New CategoryList tempList(rows[]);
+	return(tempList);
+}
+
+AddAssignment(string workName, string catName) {
+	Insert into assignment values(workName=workName, catName=catName);
+}
+
+DeleteAssignment(string workName, string catName) {
+	if workName is null then
+		Delete from assignment where catName=catName;
+	elseif catName is null then
+		Delete from assignment where workName=workName;
+	else
+		Delete from assignment where workName=workName and catName=catName;
+}
