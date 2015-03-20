@@ -1,0 +1,23 @@
+include(ServerPseudo)
+
+New WorkflowList flowList = GetWorkflowList();
+For each flowList.workflows[] {
+	New Workflow flow = GetWorkflow($_);
+	checkbox.create(flow.name);
+}
+
+CreateCategoryButton.onclick {
+	New Category cat;
+	cat.name = NameField.value;
+	cat.desc = DescField.value;
+	cat.created = Now();
+	For each WorkflowCheckbox {
+		if $_.checked then cat.worflows.add flow.name
+	}
+	AddCategory(cat);
+	form.clear;
+}
+
+CancelButton.onclick {
+	display DefaultView;
+}

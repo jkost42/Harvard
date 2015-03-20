@@ -19,6 +19,14 @@ Class CategoryList {
 	string[] categories;
 }
 
+Class WorkflowList {
+	string[] workflows;
+}
+
+Class SingleCatWorkflows {
+	string[] workflows;
+}
+
 AddCategory(Category cat) {
 	Insert into category values(name=cat.name, desc=cat.desc, creation=Now());
 	For each cat.workflows[] {
@@ -33,7 +41,7 @@ AddWorkflow(Workflow work) {
 	}
 }
 
-DeleteCategory(Category cat) {
+Boolean DeleteCategory(Category cat) {
 	For each cat.workflows[] {
 		Select count(*) as num from assignment where workName=$_;
 		if num = 1 then return False;
@@ -81,6 +89,21 @@ Workflow GetWorkflow(string name) {
 CategoryList GetCategoryList() {
 	rows = Select name from category;
 	New CategoryList tempList(rows[]);
+	return(tempList);
+}
+
+WorkflowList GetWorkflowList() {
+	rows = Select name from workflow;
+	New WorkflowList tempList(rows[]);
+	return(tempList);
+}
+
+SingleCatWorkflows GetSingletonList(Category cat) {
+	New SingleCatWorkflows tempList;
+	For each cat.workflows[] {
+		Select count(*) as num from assignment where workName=$_;
+		if num = 1 then tempList.add $_;
+	}
 	return(tempList);
 }
 

@@ -1,0 +1,28 @@
+include(ServerPseudo)
+
+New Workflow work = GetWorkflow(passedVal);
+display work;
+
+UpdateButton.onclick {
+	New Workflow work;
+	For each CategoryCheckbox {
+		if $_.checked then work.categories.add cat.name
+	}
+	if work.categories is empty then {
+		error.display "A Workflow must be associated with at least 1 Category.  Please select a category to continue";
+		break;
+	}
+	work.name = NameField.value;
+	work.desc = DescField.value;
+	work.steps = StepsField.value;
+	work.modified = Now();
+	UpdateWorkflow(work);
+}
+
+DeleteButton.onclick {
+	DeleteWorkflow(work);
+}
+
+BackButton.onclick {
+	display DefaultView;
+}

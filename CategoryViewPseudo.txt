@@ -1,0 +1,27 @@
+include(ServerPseudo)
+
+New Category cat = GetCategory(passedVal);
+display cat;
+
+UpdateButton.onclick{
+	New Category cat;
+	cat.name = NameField.value;
+	cat.desc = DescField.value;
+	cat.modified = Now();
+	For each WorkflowCheckbox {
+		if $_.checked then cat.worflows.add flow.name
+	}
+	UpdateCategory(cat);
+}
+
+DeleteButton.onclick {
+	If not DeleteCategory(cat) then {
+		New SingleCatWorkflows workList = GetSingletonList(cat);
+		error.display "Cannot delete a category if it is the sole category a workflow is associated with.
+			Please check the following workflows:" . display workList
+	}
+}
+
+BackButton.onclick {
+	display DefaultView;
+}

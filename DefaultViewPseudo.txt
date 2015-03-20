@@ -1,0 +1,27 @@
+include(ServerPseudo)
+
+New CategoryList catList = GetCategoryList();
+If catList is null then display CreateCategory;
+New Category[] allCats;
+
+For each catList.categories[] {
+	New Category cat = GetCategory($_);
+	allCats.add cat;
+	display cat;
+}
+
+CreateCategoryButton.onpress {
+	display CreateCategory;
+}
+
+CreateWorkflowButton.onpress {
+	display CreateWorkflow;
+}
+
+CategoryLink.onclick {
+	display CategoryView(cat.name);
+}
+
+WorkflowLink.onclick {
+	display WorkflowView(allCats[i].workflows[j]);
+}	
